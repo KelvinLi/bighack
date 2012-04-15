@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <png.h>
 #include <pari/pari.h>
+#include <math.h>
 
 #define ERROR 1
 #define OK 0
@@ -45,6 +46,7 @@ int pngtest(int **map, int WIDTH, int HEIGHT) {
     png_bytepp row_pointers;
     int i;
     int j;
+    int intensity;
 
     FILE *fp;
     png_structp png_ptr;
@@ -62,17 +64,14 @@ int pngtest(int **map, int WIDTH, int HEIGHT) {
             return ERROR;
         }
         for (j = 0; j < WIDTH; j++) {
-            #if 0
-            row_pointers[i][4*j] = (png_byte) map[i][j];
-            row_pointers[i][4*j+1] = (png_byte) map[i][j];
-            row_pointers[i][4*j+2] = (png_byte) map[i][j];
-            row_pointers[i][4*j] = (map[i][j]>0) ? 0xFF : 0;
-            row_pointers[i][4*j+1] = (map[i][j]>0) ? 0xFF : 0;
-            row_pointers[i][4*j+2] = (map[i][j]>0) ? 0xFF : 0;
-            #endif
-            if (map[i][j] > 0) {row_pointers[i][4*j]=0xFF; row_pointers[i][4*j+1]=0xFF; row_pointers[i][4*j+2]=0xFF;}
-            else               {row_pointers[i][4*j]=0; row_pointers[i][4*j+1]=0; row_pointers[i][4*j+2]=0;}
-            row_pointers[i][4*j+3] = 0xFF;
+            intensity = 80*map[i][j];
+            if (map[i][j] > 0) {
+                row_pointers[i][4*j]=(intensity < 0xFF) ? intensity : 0xFF;
+                row_pointers[i][4*j+1]=0;
+                row_pointers[i][4*j+2]=0;
+                row_pointers[i][4*j+3] =0xFF;
+            } else {row_pointers[i][4*j]=0xFF; row_pointers[i][4*j+1]=0xFF; row_pointers[i][4*j+2]=0xFF; row_pointers[i][4*j+3]=0xFF;}
+
         }
     }
 
@@ -113,8 +112,8 @@ int pngtest(int **map, int WIDTH, int HEIGHT) {
 
 int main() {
     int *turn_arr;
-    struct point map_top_left = {.x=-5000, .y=5000};
-    struct point map_bot_right = {.x=5000, .y=-5000};
+    struct point map_top_left = {.x=-600, .y=600};
+    struct point map_bot_right = {.x=600, .y=-600};
     int turn_arr_size = pari_gen_turn_arr(&turn_arr, 1000000);
     int** map = make_map(turn_arr, turn_arr_size, &map_top_left, &map_bot_right);
     int is_success = pngtest(map, (map_bot_right.x - map_top_left.x + 1), (map_top_left.y - map_bot_right.y + 1));

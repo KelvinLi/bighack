@@ -28,7 +28,7 @@ int** make_map(int* turn_arr, int turn_arr_size, point_type *map_top_left, point
 
     /* Starting position not arbitrary - relative to map grid selection.
        The origin is defined at the bottom left corner. */
-    int ant_pos[3] = {0, 0, 0};
+    int ant_pos[3] = {0, 0, 3};
     
     /* Allocate memory for map */
     int** map = malloc(map_height*sizeof(int*));
@@ -46,9 +46,7 @@ int** make_map(int* turn_arr, int turn_arr_size, point_type *map_top_left, point
 
     i = 0;
     while (i < turn_arr_size) {
-        if (2*ant_pos[0] >= 1 && 2*ant_pos[0] < map_width-1 && 2*ant_pos[1] >= 1 && 2*ant_pos[1] < map_height-1) {
-            compress_path_to_map(ant_pos, map);
-        }        
+        compress_path_to_map(ant_pos, map, map_width, map_height);
         if (n == turn_arr[i]) {
             turn_left(ant_pos); i++;
         } else {
@@ -59,7 +57,7 @@ int** make_map(int* turn_arr, int turn_arr_size, point_type *map_top_left, point
 
     // add the last turn (ie. always ends on a turn)
     if (ant_pos[0] >= 0 && ant_pos[0] < map_width && ant_pos[1] >= 0 && ant_pos[1] < map_height) {
-        compress_path_to_map(ant_pos, map);
+        compress_path_to_map(ant_pos, map, map_width, map_height);
     }        
 
     return map;

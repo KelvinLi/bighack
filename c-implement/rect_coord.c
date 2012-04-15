@@ -53,38 +53,22 @@ void turn_left(int* ant_pos) {
     ant_pos[2] = (ant_pos[2]-1) & 3;
 }
 
-void compress_path_to_map(int* ant_pos, int** map) {
+void compress_path_to_map(int* ant_pos, int** map, int map_width, int map_height) {
     /* A function that takes a path and a map, calculates the pixels
        in the map to which to add counts, and adds the counts to the
        map iff the pixels are on the map. */
 
     int side = ant_pos[2];
-    int x = ant_pos[0]*2;
-    int y = ant_pos[1]*2;
+    int x = ant_pos[0] + map_width/2;
+    int y = ant_pos[1] + map_height/2;
 
-    if (side == TOP) {
-        #ifndef NO_LINE_PAD
-        map[y+1][x-1] += 1;
+    if (side == TOP && 0<=x && x<=map_width && 0<=y+1 && y+1<map_height) {
+        map[y+1][x] += 1;
+    } else if (side == RIGHT && 0<=x+1 && x+1<=map_width && 0<=y+1 && y+1<map_height) {
         map[y+1][x+1] += 1;
-        #endif
-        map[y+1][x] += 2;
-    } else if (side == RIGHT) {
-        #ifndef NO_LINE_PAD
-        map[y-1][x-1] += 1;
-        map[y+1][x-1] += 1;
-        #endif
-        map[y][x-1] += 2;
-    } else if (side == BOT) {
-        #ifndef NO_LINE_PAD
-        map[y-1][x-1] += 1;
-        map[y-1][x+1] += 1;
-        #endif
-        map[y-1][x] += 2;
-    } else if (side == LEFT) {
-        #ifndef NO_LINE_PAD
-        map[y-1][x+1] += 1;
-        map[y+1][x+1] += 1;
-        #endif
-        map[y][x+1] += 2;
+    } else if (side == BOT && 0<=x+1 && x+1<=map_width && 0<=y && y<map_height) {
+        map[y][x+1] += 1;
+    } else if (side == LEFT && 0<=x && x<=map_width && 0<=y && y<map_height) {
+        map[y][x] += 1;
     }
 }
