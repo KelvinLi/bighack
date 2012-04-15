@@ -54,8 +54,26 @@ void compress_path_to_map(int* ant_pos, int** map) {
     /* A function that takes a path and a map, calculates the pixels
        in the map to which to add counts, and adds the counts to the
        map iff the pixels are on the map. */
+
     int side = ant_pos[2];
+    int x = ant_pos[0]*2;
+    int y = ant_pos[1]*2;
+
     if (side == TOP) {
-        
+        map[y+1][x-1] += 1;
+        map[y+1][x] += 2;
+        map[y+1][x+1] += 1;
+    } else if (side == RIGHT) {
+        map[y-1][x-1] += 1;
+        map[y][x-1] += 2;
+        map[y+1][x-1] += 1;
+    } else if (side == BOT) {
+        map[y-1][x-1] += 1;
+        map[y-1][x] += 2;
+        map[y-1][x+1] += 1;
+    } else if (side == LEFT) {
+        map[y-1][x+1] += 1;
+        map[y][x+1] += 2;
+        map[y+1][x+1] += 1;
     }
 }
