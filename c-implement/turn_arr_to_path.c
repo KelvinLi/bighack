@@ -33,10 +33,10 @@ int** make_map(int* turn_arr, int map_width, int map_height) {
         compress_path_to_map(ant_pos, map);
         
         if (n == next_turn) {
-            ant_pos = turn_left(ant_pos);
+            turn_left(ant_pos);
             ++i;
         } else {
-            ant_pos = go_straight(ant_pos);
+            go_straight(ant_pos);
         }
 
         ++n;
