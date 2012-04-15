@@ -2,29 +2,37 @@
 #include <stdlib.h>
 #include <png.h>
 #include <pari/pari.h>
+#include "turn_arr_to_path.h"
 
 #define ERROR 1
 #define OK 0
 
-void pari_test() {
+int* pari_gen_turn_arr(int turn_arr_size) {
     ulong m;
+    ulong i = 0;
+    ulong p = 0;
+    int *turn_arr;
 
+    turn_arr = malloc(turn_arr_size * sizeof(*turn_arr));
+    if (turn_arr == NULL) {
+        return NULL;
+    }
+    
     printf("hi\n");
-    pari_init(100000000, 1000000000);
+    pari_init(100000000, turn_arr_size);
 
     m = maxprime();
-    printf("%ld\n", (long) m);
 
-    #if 0
     byteptr ptr = diffptr;
-    ulong p = 0;
+    
     while (p < m) {
         NEXT_PRIME_VIADIFF(p, ptr);
-        printf("%ld\n", (long) p);
+        turn_arr[i] = p;
+        i++;
     }
-    #endif
 
     pari_close();
+    return turn_arr;
 }
 
 void free_row_pointers(png_bytepp rp, unsigned int height) {
@@ -103,6 +111,9 @@ int pngtest() {
 }
 
 int main() {
+    int turn_arr_size = 10000;
+    int* turn_arr = pari_gen_turn_arr(turn_arr_size);
+    int** map = make_map(turn_arr, turn_arr_size, );
     int is_success = pngtest();
     return is_success;
 }
