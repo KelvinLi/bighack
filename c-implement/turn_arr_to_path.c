@@ -1,6 +1,15 @@
+#include <stdlib.h>
 #include "rect_coord.h"
 
-int** make_map(int* turn_arr, int map_width, int map_height) {
+void free2darray(int **arr, int height) {
+    int i;
+    for (i = 0; i < height; i++) {
+        free(arr[i]);
+    }
+    free(arr);
+}
+
+int** make_map(int* turn_arr, int turn_arr_size, int map_width, int map_height) {
     /* Takes a strictly-increasing set turn_arr (ie. the input from
        the prime number generator or other generator) and tests the
        natural numbers on them. If the number tested is in turn_arr,
@@ -28,7 +37,7 @@ int** make_map(int* turn_arr, int map_width, int map_height) {
         }
     }
 
-    while (i < length(turn_arr)) {
+    while (i < turn_arr_size) {
         next_turn = turn_arr[i];
         compress_path_to_map(ant_pos, map);
         
@@ -47,4 +56,3 @@ int** make_map(int* turn_arr, int map_width, int map_height) {
 
     return map;
 }
-
