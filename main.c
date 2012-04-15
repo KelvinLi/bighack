@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <png.h>
 #include <pari/pari.h>
 
@@ -26,28 +27,75 @@ void pari_test() {
     pari_close();
 }
 
+void free_row_pointers(png_bytepp rp, unsigned int height) {
+    unsigned int i;
+    for (i = 0; i < height; i++) {
+        free(rp[i]);
+    }
+    free(rp);
+}
+
 int pngtest() {
     const char file_name[] = "hi.png";
-    FILE *fp;
-    png_structp png_ptr;
-    png_infop info_ptr;
-    png_colorp palette;
+    const unsigned int WIDTH = 500;
+    const unsigned int HEIGHT = 500;
+    const unsigned char BITDEPTH = 16;
+    png_bytepp row_pointers;
+    unsigned int i;
+    unsigned int j;
 
-    fp = fopen(file_name, "wb");
-    if (fp == NULL) return ERROR;
-
-    png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
-    if (png_ptr == NULL) {
-        fclose(fp);
+    row_pointers = malloc(HEIGHT * sizeof(png_bytep));
+    if (row_pointers == NULL) {
         return ERROR;
     }
 
+    for (i = 0; i < HEIGHT; i++) {
+        row_pointers[i] = malloc(WIDTH * sizeof(png_byte));
+        if (row_pointers[i] == NULL) {
+            free_row_pointers(row_pointers, i);
+            return ERROR;
+        }
+        for (j = 0; j < WIDTH; j++) {
+            row_pointers[i][j] = 0x1FF;
+        }
+    }
+
+    FILE *fp;
+    png_structp png_ptr;
+    png_infop info_ptr;
+
+    fp = fopen(file_name, "wb");
+    if (fp == NULL) return ERROR;
+    png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
+    if (png_ptr == NULL) {
+        fclose(fp); free_row_pointers(row_pointers, HEIGHT);
+        return ERROR;
+    }
     info_ptr = png_create_info_struct(png_ptr);
     if (info_ptr == NULL) {
-        fclose(fp);
-        png_de
+        fclose(fp); free_row_pointers(row_pointers, HEIGHT);
+        png_destroy_write_struct(&png_ptr, NULL);
+        return ERROR;
     }
-    fclose(fp);
+    if (setjmp(png_jmpbuf(png_ptr))) {
+        fclose(fp); free_row_pointers(row_pointers, HEIGHT);
+        png_destroy_write_struct(&png_ptr, &info_ptr);
+        return ERROR;
+    }
+    png_init_io(png_ptr, fp);
+
+    png_set_IHDR(png_ptr, info_ptr,
+                 WIDTH, HEIGHT, BITDEPTH,
+                 PNG_COLOR_TYPE_RGBA, PNG_INTERLACE_NONE,
+                 PNG_COMPRESSION_TYPE_BASE,
+                 PNG_FILTER_TYPE_BASE);
+
+    png_write_info(png_ptr, info_ptr);
+    png_write_image(png_ptr, row_pointers);
+    png_write_end(png_ptr, info_ptr);
+
+    png_destroy_write_struct(&png_ptr, &info_ptr);
+    fclose(fp); free_row_pointers(row_pointers, HEIGHT);
     return OK;
 }
 
