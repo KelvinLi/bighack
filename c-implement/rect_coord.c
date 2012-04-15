@@ -21,6 +21,8 @@
 
 */
 
+#include "rect_coord.h"
+
 
 /* Sides */
 
@@ -34,13 +36,13 @@ int LEFT = 3;
 
 void go_straight(int* ant_pos) {
     /* Updates the side the ant is on by going straight. */
-    if (ant_pos[2] == TOP) {
+    if ((ant_pos[2] & 3) == TOP) {
         ant_pos[0]--;
-    } else if (ant_pos[2] == RIGHT) {
+    } else if ((ant_pos[2] & 3) == RIGHT) {
         ant_pos[1]++;
-    } else if (ant_pos[2] == BOT) {
+    } else if ((ant_pos[2] & 3) == BOT) {
         ant_pos[0]++;
-    } else if (ant_pos[2] == LEFT) {
+    } else if ((ant_pos[2] & 3) == LEFT) {
         ant_pos[1]--;
     }
 }

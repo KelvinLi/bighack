@@ -1,6 +1,7 @@
 #include "turn_arr_to_path.h"
 #include "rect_coord.h"
 #include <stdlib.h>
+#include <string.h>
 
 void free2darray(int **arr, int height) {
     int i;
@@ -40,6 +41,7 @@ int** make_map(int* turn_arr, int turn_arr_size, point_type *map_top_left, point
             free2darray(map,i);
             return NULL;  // malloc fail
         }
+        memset(map[i], 0, map_width*sizeof(int));
     }
 
     i = 0;
@@ -50,12 +52,10 @@ int** make_map(int* turn_arr, int turn_arr_size, point_type *map_top_left, point
         }        
 
         if (n == turn_arr[i]) {
-            turn_left(ant_pos);
-            i++;
+            turn_left(ant_pos); i++;
         } else {
             go_straight(ant_pos);
         }
-
         n++;
     }
 

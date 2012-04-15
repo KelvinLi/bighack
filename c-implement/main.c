@@ -7,30 +7,29 @@
 #define ERROR 1
 #define OK 0
 
-int* pari_gen_turn_arr(int turn_arr_size) {
+int pari_gen_turn_arr(int **turn_arr, int size_hint) {
     ulong m;
     int i = 0;
     ulong p = 0;
-    int *turn_arr;
 
-    turn_arr = malloc(turn_arr_size * sizeof(*turn_arr));
-    if (turn_arr == NULL) {
-        return NULL;
+    *turn_arr = malloc(size_hint * sizeof(**turn_arr));
+    if (*turn_arr == NULL) {
+        return (int) NULL;
     }
-    pari_init(10000000, turn_arr_size);
+    pari_init(10000000, size_hint);
     
     m = maxprime();
 
     byteptr ptr = diffptr;
     
-    while (p < m && i < turn_arr_size) {
+    while (p < m && i < size_hint) {
         NEXT_PRIME_VIADIFF(p, ptr);
-        turn_arr[i] = p;
+        (*turn_arr)[i] = p;
         i++;
     }
 
     pari_close();
-    return turn_arr;
+    return i;
 }
 
 void free_row_pointers(png_bytepp rp, unsigned int height) {
@@ -68,10 +67,12 @@ int pngtest(int **map, int WIDTH, int HEIGHT) {
             row_pointers[i][4*j] = (png_byte) map[i][j];
             row_pointers[i][4*j+1] = (png_byte) map[i][j];
             row_pointers[i][4*j+2] = (png_byte) map[i][j];
-            #endif
             row_pointers[i][4*j] = (map[i][j]>0) ? 0xFF : 0;
             row_pointers[i][4*j+1] = (map[i][j]>0) ? 0xFF : 0;
             row_pointers[i][4*j+2] = (map[i][j]>0) ? 0xFF : 0;
+            #endif
+            if (map[i][j] > 0) {row_pointers[i][4*j]=0xFF; row_pointers[i][4*j+1]=0xFF; row_pointers[i][4*j+2]=0xFF;}
+            else               {row_pointers[i][4*j]=0; row_pointers[i][4*j+1]=0; row_pointers[i][4*j+2]=0;}
             row_pointers[i][4*j+3] = 0xFF;
         }
     }
@@ -112,11 +113,13 @@ int pngtest(int **map, int WIDTH, int HEIGHT) {
 }
 
 int main() {
-    int turn_arr_size = 1000;
-    struct point map_top_left = {.x=-300, .y=300};
-    struct point map_bot_right = {.x=300, .y=-300};
-    int* turn_arr = pari_gen_turn_arr(turn_arr_size);
+    int *turn_arr;
+    struct point map_top_left = {.x=-700, .y=700};
+    struct point map_bot_right = {.x=700, .y=-700};
+    int turn_arr_size = pari_gen_turn_arr(&turn_arr, 100000);
+    printf("hi");
     int** map = make_map(turn_arr, turn_arr_size, &map_top_left, &map_bot_right);
+    printf("hi");
     int is_success = pngtest(map, (map_bot_right.x - map_top_left.x), (map_top_left.y - map_bot_right.y));
     return is_success;
 }
