@@ -1,6 +1,6 @@
 #include "rect_coord.h"
 
-int[][] make_map(int* turn_arr, int map_width, int map_height) {
+int** make_map(int* turn_arr, int map_width, int map_height) {
     /* Takes a strictly-increasing set turn_arr (ie. the input from
        the prime number generator or other generator) and tests the
        natural numbers on them. If the number tested is in turn_arr,
@@ -12,11 +12,23 @@ int[][] make_map(int* turn_arr, int map_width, int map_height) {
 
     int i = 0;
     int n = 1;
-    int map[][];  // need to dynamically allocate
     int ant_pos[3] = {0,0,0};  // arbitrary starting side
     int next_turn;
     
-    while (i < len(turn_arr)) {
+    /* Allocate memory for map */
+    int** map = malloc(map_height*sizeof(int*));
+    if (map == NULL) {
+        return NULL;  // malloc fail
+    }
+    for (i = 0; i < map_height; i++) {
+        map[i] = malloc(map_width*sizeof(int));
+        if (map[i] == NULL) {
+            free2darray(map,i);
+            return NULL;  // malloc fail
+        }
+    }
+
+    while (i < length(turn_arr)) {
         next_turn = turn_arr[i];
         compress_path_to_map(ant_pos, map);
         
@@ -36,9 +48,3 @@ int[][] make_map(int* turn_arr, int map_width, int map_height) {
     return map;
 }
 
-void compress_path_to_map(int* ant_pos, int[][] map) {
-    /* A function that takes a path and a map, calculates the pixels
-       in the map to which to add counts, and adds the counts to the
-       map. */
-    
-}
