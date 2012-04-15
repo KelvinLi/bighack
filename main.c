@@ -37,9 +37,9 @@ void free_row_pointers(png_bytepp rp, unsigned int height) {
 
 int pngtest() {
     const char file_name[] = "hi.png";
-    const unsigned int WIDTH = 500;
-    const unsigned int HEIGHT = 500;
-    const unsigned char BITDEPTH = 16;
+    const unsigned int WIDTH = 273;
+    const unsigned int HEIGHT = 892;
+    const unsigned char BITDEPTH = 8;
     png_bytepp row_pointers;
     unsigned int i;
     unsigned int j;
@@ -50,13 +50,16 @@ int pngtest() {
     }
 
     for (i = 0; i < HEIGHT; i++) {
-        row_pointers[i] = malloc(WIDTH * sizeof(png_byte));
+        row_pointers[i] = malloc(4*WIDTH * sizeof(png_byte));
         if (row_pointers[i] == NULL) {
             free_row_pointers(row_pointers, i);
             return ERROR;
         }
-        for (j = 0; j < WIDTH; j++) {
-            row_pointers[i][j] = 0x1FF;
+        for (j = 0; j < 4*WIDTH; j=j+4) {
+            row_pointers[i][j] = 0xFF;
+            row_pointers[i][j+1] = 0xEE;
+            row_pointers[i][j+2] = 0xDD;
+            row_pointers[i][j+3] = 0xCC;
         }
     }
 
