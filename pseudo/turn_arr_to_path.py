@@ -17,18 +17,18 @@ def make_path(turn_arr):
         hash_table: {(x,y,side): count, ...}
 
     """
-    i = 0
+    i,n = 0,1
     hash_table = {}
-    ant_side = (0,0,0)  # arbitrary starting side
-    direction = 0  # arbitrary starting direction
-    n = 1  # consider c optimize
-    for i in range(len(turn_arr)):  # consider c optimize
+    ant_pos = (0,0,0)  # arbitrary starting side
+    while i < len(turn_arr):
         next_turn = turn_arr[i]
-        while n != next_turn:
-            hash_table[ant_side] = hash_table.get(ant_side,0) + 1
-            ant_side, direction = go_straight(ant_side, direction)
-            n += 1
-        ant_side, direction = turn_left(ant_side, direction)
+        hash_table[ant_pos] = hash_table.get(ant_pos,0) + 1
+        if n == next_turn:
+            ant_pos = turn_left(ant_pos)
+            i += 1
+        else:
+            ant_pos = go_straight(ant_pos)
         n += 1
-        i += 1
+    # add the last turn (ie. always ends on a turn)
+    hash_table[ant_pos] = hash_table.get(ant_pos,0) + 1
     return hash_table
