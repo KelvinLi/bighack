@@ -9,7 +9,9 @@ void free2darray(int **arr, int height) {
     free(arr);
 }
 
-int** make_map(int* turn_arr, int turn_arr_size, int map_width, int map_height) {
+struct point { int x,y; };
+
+int** make_map(int* turn_arr, int turn_arr_size, struct point map_top_left, struct point map_bot_right) {
     /* Takes a strictly-increasing set turn_arr (ie. the input from
        the prime number generator or other generator) and tests the
        natural numbers on them. If the number tested is in turn_arr,
@@ -21,8 +23,13 @@ int** make_map(int* turn_arr, int turn_arr_size, int map_width, int map_height) 
 
     int i = 0;
     int n = 1;
-    int ant_pos[3] = {0,0,0};  // arbitrary starting side
+    int map_width = map_bot_right.x - map_top_left.x + 1;
+    int map_height = map_top_left.y - map_bot_right.y + 1;
     int next_turn;
+
+    /* Starting position not arbitrary - relative to map grid selection.
+       The origin is defined at the bottom left corner. */
+    int ant_pos[3] = {-map_top_left.x,-map_bot_right.y,0};
     
     /* Allocate memory for map */
     int** map = malloc(map_height*sizeof(int*));
@@ -39,8 +46,11 @@ int** make_map(int* turn_arr, int turn_arr_size, int map_width, int map_height) 
 
     while (i < turn_arr_size) {
         next_turn = turn_arr[i];
-        compress_path_to_map(ant_pos, map);
-        
+
+        if (ant_pos[0] >= 0 && ant_pos[0] < map_width && ant_pos[1] >= 0 && ant_pos[1] < map_height) {
+            compress_path_to_map(ant_pos, map);
+        }        
+
         if (n == next_turn) {
             turn_left(ant_pos);
             ++i;
@@ -52,7 +62,9 @@ int** make_map(int* turn_arr, int turn_arr_size, int map_width, int map_height) 
     }
 
     // add the last turn (ie. always ends on a turn)
-    compress_path_to_map(ant_pos, map);
+    if (ant_pos[0] >= 0 && ant_pos[0] < map_width && ant_pos[1] >= 0 && ant_pos[1] < map_height) {
+        compress_path_to_map(ant_pos, map);
+    }        
 
     return map;
 }
