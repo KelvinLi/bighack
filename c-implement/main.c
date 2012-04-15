@@ -1,15 +1,15 @@
+#include "turn_arr_to_path.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <png.h>
 #include <pari/pari.h>
-#include "turn_arr_to_path.h"
 
 #define ERROR 1
 #define OK 0
 
 int* pari_gen_turn_arr(int turn_arr_size) {
     ulong m;
-    ulong i = 0;
+    int i = 0;
     ulong p = 0;
     int *turn_arr;
 
@@ -17,15 +17,13 @@ int* pari_gen_turn_arr(int turn_arr_size) {
     if (turn_arr == NULL) {
         return NULL;
     }
+    pari_init(10000000, turn_arr_size);
     
-    printf("hi\n");
-    pari_init(100000000, turn_arr_size);
-
     m = maxprime();
 
     byteptr ptr = diffptr;
     
-    while (p < m) {
+    while (p < m && i < turn_arr_size) {
         NEXT_PRIME_VIADIFF(p, ptr);
         turn_arr[i] = p;
         i++;
@@ -43,14 +41,16 @@ void free_row_pointers(png_bytepp rp, unsigned int height) {
     free(rp);
 }
 
-int pngtest() {
+int pngtest(int **map, int WIDTH, int HEIGHT) {
     const char file_name[] = "hi.png";
-    const unsigned int WIDTH = 273;
-    const unsigned int HEIGHT = 892;
     const unsigned char BITDEPTH = 8;
     png_bytepp row_pointers;
-    unsigned int i;
-    unsigned int j;
+    int i;
+    int j;
+
+    FILE *fp;
+    png_structp png_ptr;
+    png_infop info_ptr;
 
     row_pointers = malloc(HEIGHT * sizeof(png_bytep));
     if (row_pointers == NULL) {
@@ -63,17 +63,18 @@ int pngtest() {
             free_row_pointers(row_pointers, i);
             return ERROR;
         }
-        for (j = 0; j < 4*WIDTH; j=j+4) {
-            row_pointers[i][j] = 0xFF;
-            row_pointers[i][j+1] = 0xEE;
-            row_pointers[i][j+2] = 0xDD;
-            row_pointers[i][j+3] = 0xCC;
+        for (j = 0; j < WIDTH; j++) {
+            #if 0
+            row_pointers[i][4*j] = (png_byte) map[i][j];
+            row_pointers[i][4*j+1] = (png_byte) map[i][j];
+            row_pointers[i][4*j+2] = (png_byte) map[i][j];
+            #endif
+            row_pointers[i][4*j] = (map[i][j]>0) ? 0xFF : 0;
+            row_pointers[i][4*j+1] = (map[i][j]>0) ? 0xFF : 0;
+            row_pointers[i][4*j+2] = (map[i][j]>0) ? 0xFF : 0;
+            row_pointers[i][4*j+3] = 0xFF;
         }
     }
-
-    FILE *fp;
-    png_structp png_ptr;
-    png_infop info_ptr;
 
     fp = fopen(file_name, "wb");
     if (fp == NULL) return ERROR;
@@ -111,9 +112,11 @@ int pngtest() {
 }
 
 int main() {
-    int turn_arr_size = 10000;
+    int turn_arr_size = 1000;
+    struct point map_top_left = {.x=-300, .y=300};
+    struct point map_bot_right = {.x=300, .y=-300};
     int* turn_arr = pari_gen_turn_arr(turn_arr_size);
-    int** map = make_map(turn_arr, turn_arr_size, );
-    int is_success = pngtest();
+    int** map = make_map(turn_arr, turn_arr_size, &map_top_left, &map_bot_right);
+    int is_success = pngtest(map, (map_bot_right.x - map_top_left.x), (map_top_left.y - map_bot_right.y));
     return is_success;
 }

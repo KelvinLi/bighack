@@ -1,5 +1,6 @@
-#include <stdlib.h>
+#include "turn_arr_to_path.h"
 #include "rect_coord.h"
+#include <stdlib.h>
 
 void free2darray(int **arr, int height) {
     int i;
@@ -9,9 +10,7 @@ void free2darray(int **arr, int height) {
     free(arr);
 }
 
-struct point { int x,y; };
-
-int** make_map(int* turn_arr, int turn_arr_size, struct point map_top_left, struct point map_bot_right) {
+int** make_map(int* turn_arr, int turn_arr_size, point_type *map_top_left, point_type *map_bot_right) {
     /* Takes a strictly-increasing set turn_arr (ie. the input from
        the prime number generator or other generator) and tests the
        natural numbers on them. If the number tested is in turn_arr,
@@ -23,13 +22,12 @@ int** make_map(int* turn_arr, int turn_arr_size, struct point map_top_left, stru
 
     int i = 0;
     int n = 1;
-    int map_width = map_bot_right.x - map_top_left.x + 1;
-    int map_height = map_top_left.y - map_bot_right.y + 1;
-    int next_turn;
+    int map_width = map_bot_right->x - map_top_left->x + 1;
+    int map_height = map_top_left->y - map_bot_right->y + 1;
 
     /* Starting position not arbitrary - relative to map grid selection.
        The origin is defined at the bottom left corner. */
-    int ant_pos[3] = {-map_top_left.x,-map_bot_right.y,0};
+    int ant_pos[3] = {-map_top_left->x, -map_bot_right->y, 0};
     
     /* Allocate memory for map */
     int** map = malloc(map_height*sizeof(int*));
@@ -44,21 +42,21 @@ int** make_map(int* turn_arr, int turn_arr_size, struct point map_top_left, stru
         }
     }
 
+    i = 0;
     while (i < turn_arr_size) {
-        next_turn = turn_arr[i];
 
-        if (ant_pos[0] >= 0 && ant_pos[0] < map_width && ant_pos[1] >= 0 && ant_pos[1] < map_height) {
+        if (2*ant_pos[0] >= 1 && 2*ant_pos[0] < map_width-1 && 2*ant_pos[1] >= 1 && 2*ant_pos[1] < map_height-1) {
             compress_path_to_map(ant_pos, map);
         }        
 
-        if (n == next_turn) {
+        if (n == turn_arr[i]) {
             turn_left(ant_pos);
-            ++i;
+            i++;
         } else {
             go_straight(ant_pos);
         }
 
-        ++n;
+        n++;
     }
 
     // add the last turn (ie. always ends on a turn)
