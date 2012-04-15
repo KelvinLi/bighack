@@ -21,10 +21,34 @@
 
 */
 
+
+/* Sides */
+
 int TOP = 0;
 int RIGHT = 1;
 int BOT = 2;
 int LEFT = 3;
+
+
+/* Functions that define motion for the ant */
+
+void go_straight(int* ant_pos) {
+    /* Updates the side the ant is on by going straight. */
+    if (ant_pos[2] == TOP) {
+        ant_pos[0]--;
+    } else if (ant_pos[2] == RIGHT) {
+        ant_pos[1]++;
+    } else if (ant_pos[2] == BOT) {
+        ant_pos[0]++;
+    } else if (ant_pos[2] == LEFT) {
+        ant_pos[1]--;
+    }
+}
+
+void turn_left(int* ant_pos) {
+    /* Updates the side the ant is on by turning left. */
+    ant_pos[2] = (ant_pos[2]-1)%4;
+}
 
 void compress_path_to_map(int* ant_pos, int** map) {
     /* A function that takes a path and a map, calculates the pixels
