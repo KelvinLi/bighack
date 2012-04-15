@@ -1,0 +1,18 @@
+def make_path(turn_arr,coord_system):
+    """Takes an strictly-increasing set turn_arr (ie. the input from
+    the prime number generator or other generator) and tests the
+    natural numbers on them. If the number tested is in turn_arr, then
+    tell the "ant" to turn left. Otherwise, continue going straight.
+    In either case, the path the "ant" takes is added to a hash table.
+    If the path the ant takes is already in the hash table (ie. the
+    "ant" takes a path that it has taken before), then add to the
+    count of the entry in the hash table. Finally, the function
+    returns a hash table of the path the ant took consisting of the
+    form:
+    
+        hash_table: {(x,y,side): count, ...}
+    """
+    i = len(turn_arr)-1  # c implementation of len(turn_arr)
+    hash_table = {}
+    while i:  # c implementation of while i--
+        
