@@ -1,4 +1,4 @@
-objects = main.o
+objects = main.o arith2.o
 cflags = -Wall -Wextra -O2 -lpari
 #-lm
 
@@ -7,3 +7,6 @@ bh : $(objects)
 
 main.o : main.c
 	$(CC) $(cflags) -c main.c
+
+arith2.o : arith2.c
+	$(CC) $(cflags) -c arith2.c
