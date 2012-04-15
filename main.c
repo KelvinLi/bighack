@@ -1,7 +1,11 @@
 #include <stdio.h>
+#include <png.h>
 #include <pari/pari.h>
 
-int main(){
+#define ERROR 1
+#define OK 0
+
+void pari_test() {
     ulong m;
 
     printf("hi\n");
@@ -20,5 +24,34 @@ int main(){
     #endif
 
     pari_close();
-    return 0;
+}
+
+int pngtest() {
+    const char file_name[] = "hi.png";
+    FILE *fp;
+    png_structp png_ptr;
+    png_infop info_ptr;
+    png_colorp palette;
+
+    fp = fopen(file_name, "wb");
+    if (fp == NULL) return ERROR;
+
+    png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
+    if (png_ptr == NULL) {
+        fclose(fp);
+        return ERROR;
+    }
+
+    info_ptr = png_create_info_struct(png_ptr);
+    if (info_ptr == NULL) {
+        fclose(fp);
+        png_de
+    }
+    fclose(fp);
+    return OK;
+}
+
+int main() {
+    int is_success = pngtest();
+    return is_success;
 }

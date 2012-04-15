@@ -1,5 +1,5 @@
 objects = main.o arith2.o
-cflags = -Wall -Wextra -O2 -lpari
+cflags = -Wall -Wextra -O2 -lpng -lpari
 #-lm
 
 bh : $(objects)
