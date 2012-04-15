@@ -1,5 +1,4 @@
 #include "turn_arr_to_path.h"
-#include <stdio.h>
 #include <stdlib.h>
 #include <png.h>
 #include <pari/pari.h>
@@ -114,12 +113,10 @@ int pngtest(int **map, int WIDTH, int HEIGHT) {
 
 int main() {
     int *turn_arr;
-    struct point map_top_left = {.x=-700, .y=700};
-    struct point map_bot_right = {.x=700, .y=-700};
-    int turn_arr_size = pari_gen_turn_arr(&turn_arr, 100000);
-    printf("hi");
+    struct point map_top_left = {.x=-5000, .y=5000};
+    struct point map_bot_right = {.x=5000, .y=-5000};
+    int turn_arr_size = pari_gen_turn_arr(&turn_arr, 1000000);
     int** map = make_map(turn_arr, turn_arr_size, &map_top_left, &map_bot_right);
-    printf("hi");
-    int is_success = pngtest(map, (map_bot_right.x - map_top_left.x), (map_top_left.y - map_bot_right.y));
+    int is_success = pngtest(map, (map_bot_right.x - map_top_left.x + 1), (map_top_left.y - map_bot_right.y + 1));
     return is_success;
 }

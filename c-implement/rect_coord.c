@@ -23,6 +23,7 @@
 
 #include "rect_coord.h"
 
+#undef NO_LINE_PAD
 
 /* Sides */
 
@@ -49,7 +50,7 @@ void go_straight(int* ant_pos) {
 
 void turn_left(int* ant_pos) {
     /* Updates the side the ant is on by turning left. */
-    ant_pos[2] = (ant_pos[2]-1)%4;
+    ant_pos[2] = (ant_pos[2]-1) & 3;
 }
 
 void compress_path_to_map(int* ant_pos, int** map) {
@@ -62,20 +63,28 @@ void compress_path_to_map(int* ant_pos, int** map) {
     int y = ant_pos[1]*2;
 
     if (side == TOP) {
+        #ifndef NO_LINE_PAD
         map[y+1][x-1] += 1;
+        map[y+1][x+1] += 1;
+        #endif
         map[y+1][x] += 2;
-        map[y+1][x+1] += 1;
     } else if (side == RIGHT) {
+        #ifndef NO_LINE_PAD
         map[y-1][x-1] += 1;
-        map[y][x-1] += 2;
         map[y+1][x-1] += 1;
+        #endif
+        map[y][x-1] += 2;
     } else if (side == BOT) {
+        #ifndef NO_LINE_PAD
         map[y-1][x-1] += 1;
+        map[y-1][x+1] += 1;
+        #endif
         map[y-1][x] += 2;
-        map[y-1][x+1] += 1;
     } else if (side == LEFT) {
+        #ifndef NO_LINE_PAD
         map[y-1][x+1] += 1;
-        map[y][x+1] += 2;
         map[y+1][x+1] += 1;
+        #endif
+        map[y][x+1] += 2;
     }
 }

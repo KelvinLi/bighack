@@ -1,5 +1,5 @@
 objects = main.o rect_coord.o turn_arr_to_path.o
-cflags = -Wall -Wextra -O0 -g -lpng -lpari
+cflags = -Wall -Wextra -O2 -lpng -lpari
 #-lm
 
 bh : $(objects)
