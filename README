@@ -1,1 +1,6 @@
 The big hack project
+
+Sample configurations
+    million primes (1e6)
+    bh -4640 1380 121 -545
+        x1   y1   x2   y2

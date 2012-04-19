@@ -63,15 +63,14 @@ int pngtest(int **map, int WIDTH, int HEIGHT) {
             free_row_pointers(row_pointers, i);
             return ERROR;
         }
+        memset(row_pointers[i], 0xFF, 4*WIDTH*sizeof(png_byte));
         for (j = 0; j < WIDTH; j++) {
             intensity = 50*(map[i][j] - 1);
             if (map[i][j] > 0) {
                 row_pointers[i][4*j]=(intensity < 0xFF) ? intensity : 0xFF;
                 row_pointers[i][4*j+1]=0;
                 row_pointers[i][4*j+2]=0;
-                row_pointers[i][4*j+3] =0xFF;
-            } else {row_pointers[i][4*j]=0xFF; row_pointers[i][4*j+1]=0xFF; row_pointers[i][4*j+2]=0xFF; row_pointers[i][4*j+3]=0xFF;}
-
+            }
         }
     }
 
