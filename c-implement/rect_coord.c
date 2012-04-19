@@ -22,41 +22,50 @@
 #include <string.h>
 
 /* Functions that define motion for the ant */
-void go_straight(int* ant_pos) {
+void go_straight(struct ant* ant_pos) {
     /* Updates the side the ant is on by going straight. */
-    switch(ant_pos[2] & 3) {
-        case TOP:   ant_pos[0]--; break;
-        case RIGHT: ant_pos[1]++; break;
-        case BOT:   ant_pos[0]++; break;
-        case LEFT:  ant_pos[1]--; break;
+    switch(ant_pos->side & 3) {
+        case TOP:   ant_pos->x --; break;
+        case RIGHT: ant_pos->y ++; break;
+        case BOT:   ant_pos->x ++; break;
+        case LEFT:  ant_pos->y --; break;
         default:    return; /* this is an error case */
     }
 }
 
-void turn_left(int* ant_pos) {
+void turn_left(struct ant* ant_pos) {
     /* Updates the side the ant is on by turning left. */
-    ant_pos[2] = (ant_pos[2]-1) & 3;
+    ant_pos->side = (ant_pos->side - 1) & 3;
 }
 
-void compress_path_to_map(int* ant_pos, int** map, point_type *map_top_left, point_type *map_bot_right) {
+void compress_path_to_map(struct ant* ant_pos, int** map, point_type *map_top_left, point_type *map_bot_right) {
     /* A function that takes a path and a map, calculates the pixels
        in the map to which to add counts, and adds the counts to the
        map iff the pixels are on the map. */
 
-    int side = ant_pos[2];
-    int x = ant_pos[0] - map_top_left->x;
-    int y = -ant_pos[1] + map_top_left->y;
+    int x = ant_pos->x - map_top_left->x;
+    int y = -ant_pos->y + map_top_left->y;
     int map_width = map_bot_right->x - map_top_left->x + 1;
     int map_height = map_top_left->y - map_bot_right->y + 1;
 
-    if (side == TOP && 0<=x && x<=map_width && 0<=y && y<map_height) {
-        map[y][x] += 1;
-    } else if (side == RIGHT && 0<=x+1 && x+1<=map_width && 0<=y && y<map_height) {
-        map[y][x+1] += 1;
-    } else if (side == BOT && 0<=x+1 && x+1<=map_width && 0<=y+1 && y+1<map_height) {
-        map[y+1][x+1] += 1;
-    } else if (side == LEFT && 0<=x && x<=map_width && 0<=y+1 && y+1<map_height) {
-        map[y+1][x] += 1;
+    switch(ant_pos->side) {
+        case TOP:
+            if (0<=x && x<=map_width && 0<=y && y<map_height)
+                map[y][x] += 1;
+            break;
+        case RIGHT:
+            if (0<=x+1 && x+1<=map_width && 0<=y && y<map_height)
+                map[y][x+1] += 1;
+            break;
+        case BOT:
+            if (0<=x+1 && x+1<=map_width && 0<=y+1 && y+1<map_height)
+                map[y+1][x+1] += 1;
+            break;
+        case LEFT:
+            if (0<=x && x<=map_width && 0<=y+1 && y+1<map_height)
+                map[y+1][x] += 1;
+            break;
+        default: return; /* error case */
     }
 }
 
@@ -85,7 +94,7 @@ int** make_map(int* turn_arr, int turn_arr_size, point_type *map_top_left, point
 
     /* Starting position not arbitrary - relative to map grid selection.
        The origin is defined at the bottom left corner. */
-    int ant_pos[3] = {0, 0, RIGHT};
+    struct ant ant_pos = {.x = 0, .y = 0, .side = RIGHT};
     
     /* Allocate memory for map */
     int** map = malloc(map_height*sizeof(int*));
@@ -103,18 +112,18 @@ int** make_map(int* turn_arr, int turn_arr_size, point_type *map_top_left, point
 
     i = 0;
     while (i < turn_arr_size) {
-        compress_path_to_map(ant_pos, map, map_top_left, map_bot_right);
+        compress_path_to_map(&ant_pos, map, map_top_left, map_bot_right);
         if (n == turn_arr[i]) {
-            turn_left(ant_pos); i++;
+            turn_left(&ant_pos); i++;
         } else {
-            go_straight(ant_pos);
+            go_straight(&ant_pos);
         }
         n++;
     }
 
     // add the last turn (ie. always ends on a turn)
-    if (ant_pos[0] >= 0 && ant_pos[0] < map_width && ant_pos[1] >= 0 && ant_pos[1] < map_height) {
-        compress_path_to_map(ant_pos, map, map_top_left, map_bot_right);
+    if (0<=ant_pos.x && ant_pos.x<map_width && 0<=ant_pos.y && ant_pos.y<map_height) {
+        compress_path_to_map(&ant_pos, map, map_top_left, map_bot_right);
     }        
 
     return map;
