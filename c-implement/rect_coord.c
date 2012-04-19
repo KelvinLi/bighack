@@ -21,23 +21,15 @@
 #include <stdlib.h>
 #include <string.h>
 
-/* Sides */
-const int TOP = 0;
-const int RIGHT = 1;
-const int BOT = 2;
-const int LEFT = 3;
-
 /* Functions that define motion for the ant */
 void go_straight(int* ant_pos) {
     /* Updates the side the ant is on by going straight. */
-    if ((ant_pos[2] & 3) == TOP) {
-        ant_pos[0]--;
-    } else if ((ant_pos[2] & 3) == RIGHT) {
-        ant_pos[1]++;
-    } else if ((ant_pos[2] & 3) == BOT) {
-        ant_pos[0]++;
-    } else if ((ant_pos[2] & 3) == LEFT) {
-        ant_pos[1]--;
+    switch(ant_pos[2] & 3) {
+        case TOP:   ant_pos[0]--; break;
+        case RIGHT: ant_pos[1]++; break;
+        case BOT:   ant_pos[0]++; break;
+        case LEFT:  ant_pos[1]--; break;
+        default:    return; /* this is an error case */
     }
 }
 
