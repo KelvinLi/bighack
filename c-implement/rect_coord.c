@@ -1,6 +1,4 @@
 /* Package for rectangular coordinates for use in turn_arr-to-path.c.
-
-
 *** Key things to note:
 
 -- The coordinates of any side in a coordinate system is uniquely
@@ -17,26 +15,19 @@
 
 -- This implementation in C also directly converts the paths computed
    into coordinates for the PNG output.
-
-
 */
 
 #include "rect_coord.h"
 #include <stdlib.h>
 #include <string.h>
 
-#undef NO_LINE_PAD
-
 /* Sides */
-
-int TOP = 0;
-int RIGHT = 1;
-int BOT = 2;
-int LEFT = 3;
-
+const int TOP = 0;
+const int RIGHT = 1;
+const int BOT = 2;
+const int LEFT = 3;
 
 /* Functions that define motion for the ant */
-
 void go_straight(int* ant_pos) {
     /* Updates the side the ant is on by going straight. */
     if ((ant_pos[2] & 3) == TOP) {
@@ -61,23 +52,21 @@ void compress_path_to_map(int* ant_pos, int** map, point_type *map_top_left, poi
        map iff the pixels are on the map. */
 
     int side = ant_pos[2];
-    int x = (int) (ant_pos[0] + (map_bot_right->x + map_top_left->x)/2);
-    int y = (int) (ant_pos[1] + (map_top_left->y + map_bot_right->y)/2);
-    int map_width = map_bot_right->x - map_top_left->x;
-    int map_height = map_top_left->y - map_bot_right->y;
+    int x = ant_pos[0] - map_top_left->x;
+    int y = -ant_pos[1] + map_top_left->y;
+    int map_width = map_bot_right->x - map_top_left->x + 1;
+    int map_height = map_top_left->y - map_bot_right->y + 1;
 
-    if (side == TOP && 0<=x && x<=map_width && 0<=y+1 && y+1<map_height) {
-        map[y+1][x] += 1;
-    } else if (side == RIGHT && 0<=x+1 && x+1<=map_width && 0<=y+1 && y+1<map_height) {
-        map[y+1][x+1] += 1;
-    } else if (side == BOT && 0<=x+1 && x+1<=map_width && 0<=y && y<map_height) {
-        map[y][x+1] += 1;
-    } else if (side == LEFT && 0<=x && x<=map_width && 0<=y && y<map_height) {
+    if (side == TOP && 0<=x && x<=map_width && 0<=y && y<map_height) {
         map[y][x] += 1;
+    } else if (side == RIGHT && 0<=x+1 && x+1<=map_width && 0<=y && y<map_height) {
+        map[y][x+1] += 1;
+    } else if (side == BOT && 0<=x+1 && x+1<=map_width && 0<=y+1 && y+1<map_height) {
+        map[y+1][x+1] += 1;
+    } else if (side == LEFT && 0<=x && x<=map_width && 0<=y+1 && y+1<map_height) {
+        map[y+1][x] += 1;
     }
 }
-
-
 
 void free2darray(int **arr, int height) {
     int i;
@@ -104,7 +93,7 @@ int** make_map(int* turn_arr, int turn_arr_size, point_type *map_top_left, point
 
     /* Starting position not arbitrary - relative to map grid selection.
        The origin is defined at the bottom left corner. */
-    int ant_pos[3] = {0, 0, 3};
+    int ant_pos[3] = {0, 0, RIGHT};
     
     /* Allocate memory for map */
     int** map = malloc(map_height*sizeof(int*));

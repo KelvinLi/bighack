@@ -3,7 +3,6 @@
 #include <stdio.h>
 #include <png.h>
 #include <pari/pari.h>
-#include <math.h>
 
 #define ERROR 1
 #define OK 0
@@ -65,7 +64,7 @@ int pngtest(int **map, int WIDTH, int HEIGHT) {
             return ERROR;
         }
         for (j = 0; j < WIDTH; j++) {
-            intensity = 80*map[i][j];
+            intensity = 50*(map[i][j] - 1);
             if (map[i][j] > 0) {
                 row_pointers[i][4*j]=(intensity < 0xFF) ? intensity : 0xFF;
                 row_pointers[i][4*j+1]=0;
