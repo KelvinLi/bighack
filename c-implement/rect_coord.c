@@ -57,24 +57,14 @@ void compress_path_to_map(struct ant *ant_pos, int **map, struct rect_region *ma
     int map_height = rect_region_height(map_region);
 
     switch(ant_pos->side) {
-        case TOP:
-            if (0<=x && x<=map_width && 0<=y && y<map_height)
-                map[y][x] += 1;
-            break;
-        case RIGHT:
-            if (0<=x+1 && x+1<=map_width && 0<=y && y<map_height)
-                map[y][x+1] += 1;
-            break;
-        case BOT:
-            if (0<=x+1 && x+1<=map_width && 0<=y+1 && y+1<map_height)
-                map[y+1][x+1] += 1;
-            break;
-        case LEFT:
-            if (0<=x && x<=map_width && 0<=y+1 && y+1<map_height)
-                map[y+1][x] += 1;
-            break;
-        default: return; /* error case */
+        case TOP:        break;
+        case RIGHT: x++; break;
+        case BOT:   x++; y++; break;
+        case LEFT:  y++; break;
+        default:    return; /* error case */
     }
+    if (0<=x && x<=map_width && 0<=y && y<map_height)
+        map[y][x] ++;
 }
 
 void free2darray(int **arr, int height) {
@@ -95,10 +85,10 @@ int **make_map(int *turn_arr, int turn_arr_size, struct rect_region *map_region)
        number of times the point has been crossed. This is passed
        to the PNG renderer for the final mapping of an image. */
 
-    int i = 0;
-    int n = 1;
-    int map_width = rect_region_width(map_region);
-    int map_height = rect_region_height(map_region);
+    int i;
+    int n;
+    const int map_width = rect_region_width(map_region);
+    const int map_height = rect_region_height(map_region);
 
     /* Starting position not arbitrary - relative to map grid selection.
        The origin is defined at the bottom left corner. */
@@ -118,7 +108,7 @@ int **make_map(int *turn_arr, int turn_arr_size, struct rect_region *map_region)
         memset(map[i], 0, map_width*sizeof(int));
     }
 
-    i = 0;
+    i = 0; n = 1;
     while (i < turn_arr_size) {
         compress_path_to_map(&ant_pos, map, map_region);
         if (n == turn_arr[i]) {
