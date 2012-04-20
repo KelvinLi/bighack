@@ -1,6 +1,51 @@
-The big hack project
+        ThunderAnt
+    Artistic Sequence Visualizer
 
-Sample configurations
-    million primes (1e6)
-    bh -4640 1380 121 -545
-        x1   y1   x2   y2
+    https://github.com/KelvinLi/bighack
+
+Copyright (C) 2012 Kelvin Li <ltwisabc@gmail.com>, Kenneth Lin, Michael Lin
+
+ThunderAnt is free software. See COPYING for the license.
+
+Background
+----------
+
+The idea is simple: there's an ant on an infinite lattice. The ant moves
+in a straight line one lattice point at a time. It keeps an internal
+counter for each step; if the count is a prime number, the ant turns
+left and advances one step.  Otherwise it advances in the same
+direction. ThunderAnt produces plots of this ant's journey.
+
+We the original authors (Kelvin Li, Kenneth Lin, Michael Lin) initially
+developed ThunderAnt at the 2012 Cal vs. Stanford "Big Hack" Hack-a-thon.
+ThunderAnt is publicly available in hopes that it might be useful,
+educational, or entertaining. If you are interested in contributing, please
+contact us!
+
+Setup
+-----
+
+1. The C implementation of ThunderAnt requires libpng and libpari.
+Platform-specific instructions are not provided here, nor are the library
+source or binaries distributed with ThunderAnt.
+
+2. In the c-implement/ directory, run make.
+
+3. Run "./bh -100 100 100 -100"
+
+There should now be a file called "hi.png". Open and enjoy!
+
+4. For a larger plot, try: "bh -4640 1380 121 -545"
+
+ThunderAnt is known to build and run on Debian GNU/Linux.
+
+Remarks
+-------
+
+ThunderAnt has two implementations, C and Python. The C implementation
+is *fast* but produces static PNG images. The Python implementation uses
+tkinter to present an interactive interface.
+
+Only prime numbers are currently supported. Extending to other integer
+sequences, or even representing multiple sequences simultaneously, would be
+neat ideas.
