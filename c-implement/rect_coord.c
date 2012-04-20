@@ -21,6 +21,14 @@
 #include <stdlib.h>
 #include <string.h>
 
+int rect_region_width(struct rect_region *region) {
+    return region->bot_right.x - region->top_left.x + 1;
+}
+
+int rect_region_height(struct rect_region *region) {
+    return region->top_left.y - region->bot_right.y + 1;
+}
+
 /* Functions that define motion for the ant */
 void go_straight(struct ant* ant_pos) {
     /* Updates the side the ant is on by going straight. */
@@ -38,15 +46,15 @@ void turn_left(struct ant* ant_pos) {
     ant_pos->side = (ant_pos->side - 1) & 3;
 }
 
-void compress_path_to_map(struct ant* ant_pos, int** map, point_type *map_top_left, point_type *map_bot_right) {
+void compress_path_to_map(struct ant *ant_pos, int **map, struct rect_region *map_region) {
     /* A function that takes a path and a map, calculates the pixels
        in the map to which to add counts, and adds the counts to the
        map iff the pixels are on the map. */
 
-    int x = ant_pos->x - map_top_left->x;
-    int y = -ant_pos->y + map_top_left->y;
-    int map_width = map_bot_right->x - map_top_left->x + 1;
-    int map_height = map_top_left->y - map_bot_right->y + 1;
+    int x = ant_pos->x - map_region->top_left.x;
+    int y = -ant_pos->y + map_region->top_left.y;
+    int map_width = rect_region_width(map_region);
+    int map_height = rect_region_height(map_region);
 
     switch(ant_pos->side) {
         case TOP:
@@ -77,7 +85,7 @@ void free2darray(int **arr, int height) {
     free(arr);
 }
 
-int** make_map(int* turn_arr, int turn_arr_size, point_type *map_top_left, point_type *map_bot_right) {
+int **make_map(int *turn_arr, int turn_arr_size, struct rect_region *map_region) {
     /* Takes a strictly-increasing set turn_arr (ie. the input from
        the prime number generator or other generator) and tests the
        natural numbers on them. If the number tested is in turn_arr,
@@ -89,8 +97,8 @@ int** make_map(int* turn_arr, int turn_arr_size, point_type *map_top_left, point
 
     int i = 0;
     int n = 1;
-    int map_width = map_bot_right->x - map_top_left->x + 1;
-    int map_height = map_top_left->y - map_bot_right->y + 1;
+    int map_width = rect_region_width(map_region);
+    int map_height = rect_region_height(map_region);
 
     /* Starting position not arbitrary - relative to map grid selection.
        The origin is defined at the bottom left corner. */
@@ -112,7 +120,7 @@ int** make_map(int* turn_arr, int turn_arr_size, point_type *map_top_left, point
 
     i = 0;
     while (i < turn_arr_size) {
-        compress_path_to_map(&ant_pos, map, map_top_left, map_bot_right);
+        compress_path_to_map(&ant_pos, map, map_region);
         if (n == turn_arr[i]) {
             turn_left(&ant_pos); i++;
         } else {
@@ -123,7 +131,7 @@ int** make_map(int* turn_arr, int turn_arr_size, point_type *map_top_left, point
 
     // add the last turn (ie. always ends on a turn)
     if (0<=ant_pos.x && ant_pos.x<map_width && 0<=ant_pos.y && ant_pos.y<map_height) {
-        compress_path_to_map(&ant_pos, map, map_top_left, map_bot_right);
+        compress_path_to_map(&ant_pos, map, map_region);
     }        
 
     return map;

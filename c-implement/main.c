@@ -129,8 +129,9 @@ int main(int argc, char **argv) {
     int *turn_arr;
     struct point map_top_left = {.x=a, .y=b};
     struct point map_bot_right = {.x=c, .y=d};
+    struct rect_region map_region = { .top_left=map_top_left, .bot_right=map_bot_right };
     int turn_arr_size = pari_gen_turn_arr(&turn_arr, 1000000);
-    int** map = make_map(turn_arr, turn_arr_size, &map_top_left, &map_bot_right);
-    int is_success = pngtest(map, (map_bot_right.x - map_top_left.x + 1), (map_top_left.y - map_bot_right.y + 1));
+    int** map = make_map(turn_arr, turn_arr_size, &map_region);
+    int is_success = pngtest(map, rect_region_width(&map_region), rect_region_height(&map_region));
     return is_success;
 }
