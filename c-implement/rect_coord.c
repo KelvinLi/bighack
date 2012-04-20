@@ -33,10 +33,10 @@ int rect_region_height(struct rect_region *region) {
 void go_straight(struct ant* ant_pos) {
     /* Updates the side the ant is on by going straight. */
     switch(ant_pos->side & 3) {
-        case TOP:   ant_pos->x --; break;
-        case RIGHT: ant_pos->y ++; break;
-        case BOT:   ant_pos->x ++; break;
-        case LEFT:  ant_pos->y --; break;
+        case TOP:   ant_pos->pos.x --; break;
+        case RIGHT: ant_pos->pos.y ++; break;
+        case BOT:   ant_pos->pos.x ++; break;
+        case LEFT:  ant_pos->pos.y --; break;
         default:    return; /* this is an error case */
     }
 }
@@ -51,8 +51,8 @@ void compress_path_to_map(struct ant *ant_pos, int **map, struct rect_region *ma
        in the map to which to add counts, and adds the counts to the
        map iff the pixels are on the map. */
 
-    int x = ant_pos->x - map_region->top_left.x;
-    int y = -ant_pos->y + map_region->top_left.y;
+    int x = ant_pos->pos.x - map_region->top_left.x;
+    int y = -ant_pos->pos.y + map_region->top_left.y;
     int map_width = rect_region_width(map_region);
     int map_height = rect_region_height(map_region);
 
@@ -92,7 +92,9 @@ int **make_map(int *turn_arr, int turn_arr_size, struct rect_region *map_region)
 
     /* Starting position not arbitrary - relative to map grid selection.
        The origin is defined at the bottom left corner. */
-    struct ant ant_pos = {.x = 0, .y = 0, .side = RIGHT};
+    struct ant ant_pos = {.side = RIGHT};
+    ant_pos.pos.x = 0;
+    ant_pos.pos.y = 0;
     
     /* Allocate memory for map */
     int** map = malloc(map_height*sizeof(int*));
@@ -120,7 +122,7 @@ int **make_map(int *turn_arr, int turn_arr_size, struct rect_region *map_region)
     }
 
     // add the last turn (ie. always ends on a turn)
-    if (0<=ant_pos.x && ant_pos.x<map_width && 0<=ant_pos.y && ant_pos.y<map_height) {
+    if (0<=ant_pos.pos.x && ant_pos.pos.x<map_width && 0<=ant_pos.pos.y && ant_pos.pos.y<map_height) {
         compress_path_to_map(&ant_pos, map, map_region);
     }        
 
