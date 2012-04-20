@@ -4,9 +4,6 @@
 #include <png.h>
 #include <pari/pari.h>
 
-#define ERROR 1
-#define OK 0
-
 int pari_gen_turn_arr(int **turn_arr, int size_hint) {
     ulong m;
     int i = 0;
@@ -54,14 +51,14 @@ int pngtest(int **map, int WIDTH, int HEIGHT) {
 
     row_pointers = malloc(HEIGHT * sizeof(png_bytep));
     if (row_pointers == NULL) {
-        return ERROR;
+        return EXIT_FAILURE;
     }
 
     for (i = 0; i < HEIGHT; i++) {
         row_pointers[i] = malloc(4*WIDTH * sizeof(png_byte));
         if (row_pointers[i] == NULL) {
             free_row_pointers(row_pointers, i);
-            return ERROR;
+            return EXIT_FAILURE;
         }
         memset(row_pointers[i], 0xFF, 4*WIDTH*sizeof(png_byte));
         for (j = 0; j < WIDTH; j++) {
@@ -75,22 +72,22 @@ int pngtest(int **map, int WIDTH, int HEIGHT) {
     }
 
     fp = fopen(file_name, "wb");
-    if (fp == NULL) return ERROR;
+    if (fp == NULL) return EXIT_FAILURE;
     png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
     if (png_ptr == NULL) {
         fclose(fp); free_row_pointers(row_pointers, HEIGHT);
-        return ERROR;
+        return EXIT_FAILURE;
     }
     info_ptr = png_create_info_struct(png_ptr);
     if (info_ptr == NULL) {
         fclose(fp); free_row_pointers(row_pointers, HEIGHT);
         png_destroy_write_struct(&png_ptr, NULL);
-        return ERROR;
+        return EXIT_FAILURE;
     }
     if (setjmp(png_jmpbuf(png_ptr))) {
         fclose(fp); free_row_pointers(row_pointers, HEIGHT);
         png_destroy_write_struct(&png_ptr, &info_ptr);
-        return ERROR;
+        return EXIT_FAILURE;
     }
     png_init_io(png_ptr, fp);
 
@@ -106,7 +103,7 @@ int pngtest(int **map, int WIDTH, int HEIGHT) {
 
     png_destroy_write_struct(&png_ptr, &info_ptr);
     fclose(fp); free_row_pointers(row_pointers, HEIGHT);
-    return OK;
+    return EXIT_SUCCESS;
 }
 
 int main(int argc, char **argv) {
@@ -123,7 +120,7 @@ int main(int argc, char **argv) {
         d = atoi(argv[4]);
     } else {
         printf("Bad arguments\n");
-        return 1;
+        return EXIT_FAILURE;
     }
 
     int *turn_arr;
